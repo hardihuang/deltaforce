@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角洲行动陪玩俱乐部排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 50%, #0d1421 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(rgba(76, 175, 80, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(76, 175, 80, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 1rem;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+        
+        /* Club List */
+        .club-list {
+            display: grid;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .club-card {
+            background: rgba(20, 25, 40, 0.8);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            border-radius: 8px;
+        }
+        
+        .club-card:hover {
+            border-color: rgba(76, 175, 80, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.2);
+        }
+        
+        .club-card .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-radius: 50%;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; }
+        .rank-other { background: rgba(76, 175, 80, 0.3); color: #4CAF50; }
+        
+        .club-card .content {
+            margin-left: 50px;
+        }
+        
+        .club-card .name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 8px;
+        }
+        
+        .club-card .stats {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+        
+        .club-card .stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .club-card .stats .highlight {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        
+        .club-card .tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .club-card .tag {
+            padding: 4px 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            font-size: 0.8rem;
+            border-radius: 3px;
+        }
+        
+        .club-card .prices {
+            display: flex;
+            gap: 15px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .club-card .price-item {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        
+        .club-card .price-item strong {
+            color: #FFC107;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: rgba(15, 20, 35, 0.95);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(76, 175, 80, 0.2);
+            border: none;
+            color: #4CAF50;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            text-align: center;
+        }
+        
+        .modal-header h2 {
+            color: #4CAF50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .douyin-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .douyin-link:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .price-section {
+            margin-bottom: 20px;
+        }
+        
+        .price-section h3 {
+            color: #4CAF50;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .price-card {
+            background: rgba(20, 25, 40, 0.6);
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+        }
+        
+        .price-card .service-name {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .price-card .service-price {
+            color: #FFC107;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .info-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            background: rgba(20, 25, 40, 0.6);
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .info-item .label {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .info-item .value {
+            color: #4CAF50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(76, 175, 80, 0.2);
+            text-align: center;
+        }
+        
+        .order-btn {
+            padding: 15px 40px;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .order-btn:hover {
+            background: #45a049;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(76, 175, 80, 0.2);
+            margin-top: 40px;
+        }
+        
+        .footer h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .footer p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-tabs {
+                gap: 5px;
+            }
+            
+            .nav-tab {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .club-card .content {
+                margin-left: 40px;
+            }
+            
+            .club-card .rank-badge {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            
+            .club-card .name {
+                font-size: 1.1rem;
+            }
+            
+            .club-card .stats {
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+            
+            .modal {
+                max-height: 85vh;
+            }
+            
+            .info-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>三角洲行动陪玩俱乐部排行榜</h1>
+            <p>免费开放的陪玩俱乐部导航平台 · 一键跳转下单</p>
+        </div>
+        
+        <div class="nav-tabs" id="navTabs">
+            <button class="nav-tab active" data-sort="fans">粉丝最多</button>
+            <button class="nav-tab" data-sort="value">性价比最高</button>
+            <button class="nav-tab" data-sort="orders">下单量最高</button>
+            <button class="nav-tab" data-sort="rating">评价最好</button>
+        </div>
+        
+        <div class="club-list" id="clubList"></div>
+        
+        <div class="footer">
+            <h3>赞助打赏</h3>
+            <p>如果您觉得这个平台有帮助，欢迎赞助支持持续运营</p>
+            <p style="margin-top:10px;color:#4CAF50">微信/支付宝：请联系运营者</p>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <a href="#" id="douyinLink" class="douyin-link" target="_blank">🎬 抖音视频账号</a>
+            </div>
+            <div class="modal-body">
+                <div class="price-section">
+                    <h3>陪玩服务价格</h3>
+                    <div class="price-grid" id="priceGrid"></div>
+                </div>
+                <div class="info-section" id="infoSection"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="order-btn" id="orderBtn">立即下单</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟数据
+        const clubs = [
+            {
+                id: 1,
+                name: "星火电竞护航",
+                fans: 12.5,
+                rating: 98,
+                orders: 850,
+                priceEscort: 15,
+                priceRun: 8,
+                priceBoost: 50,
+                priceTeach: 30,
+                tags: ["纯绿护航", "跑刀", "代肝", "新手教学"],
+                support售后: true,
+                douyinUrl: "https://v.douyin.com/79_RsP7TfOY/",
+                orderUrl: "https://example.com/order1"
+            },
+            {
+                id: 2,
+                name: "雷霆护航俱乐部",
+                fans: 8.2,
+                rating: 95,
+                orders: 620,
+                priceEscort: 12,
+                priceRun: 6,
+                priceBoost: 45,
+                priceTeach: 25,
+                tags: ["纯绿护航", "高端局"],
+                support售后: true,
+                douyinUrl: "https://v.douyin.com/example2/",
+                orderUrl: "https://example.com/order2"
+            },
+            {
+                id: 3,
+                name: "暗影战队",
+                fans: 15.8,
+                rating: 92,
+                orders: 1200,
+                priceEscort: 18,
+                priceRun: 10,
+                priceBoost: 60,
+                priceTeach: 35,
+                tags: ["纯绿护航", "跑刀", "代肝"],
+                support售后: false,
+                douyinUrl: "https://v.douyin.com/example3/",
+                orderUrl: "https://example.com/order3"
+            },
+            {
+                id: 4,
+                name: "猎鹰护航",
+                fans: 6.5,
+                rating: 99,
+                orders: 380,
+                priceEscort: 10,
+                priceRun: 5,
+                priceBoost: 40,
+                priceTeach: 20,
+                tags: ["纯绿护航", "新手教学"],
+                support售后: true,
+                douyinUrl: "https://v.douyin.com/example4/",
+                orderUrl: "https://example.com/order4"
+            },
+            {
+                id: 5,
+                name: "战狼俱乐部",
+                fans: 10.3,
+                rating: 94,
+                orders: 720,
+                priceEscort: 14,
+                priceRun: 7,
+                priceBoost: 55,
+                priceTeach: 28,
+                tags: ["纯绿护航", "跑刀", "高端局"],
+                support售后: true,
+                douyinUrl: "https://v.douyin.com/example5/",
+                orderUrl: "https://example.com/order5"
+            }
+        ];
+        
+        let currentSort = 'fans';
+        
+        // 排序函数
+        function sortClubs(sortType) {
+            const sorted = [...clubs];
+            switch(sortType) {
+                case 'fans':
+                    sorted.sort((a, b) => b.fans - a.fans);
+                    break;
+                case 'value':
+                    // 性价比 = 好评率*0.5 + (100-标准化价格)*0.3 + 粉丝权重*0.2
+                    sorted.sort((a, b) => {
+                        const valueA = a.rating * 0.5 + (100 - a.priceEscort * 2) * 0.3 + a.fans * 0.2;
+                        const valueB = b.rating * 0.5 + (100 - b.priceEscort * 2) * 0.3 + b.fans * 0.2;
+                        return valueB - valueA;
+                    });
+                    break;
+                case 'orders':
+                    sorted.sort((a, b) => b.orders - a.orders);
+                    break;
+                case 'rating':
+                    sorted.sort((a, b) => b.rating - a.rating);
+                    break;
+            }
+            return sorted;
+        }
+        
+        // 渲染列表
+        function renderList() {
+            const sorted = sortClubs(currentSort);
+            const listEl = document.getElementById('clubList');
+            listEl.innerHTML = sorted.map((club, index) => `
+                <div class="club-card" onclick="openModal(${club.id})">
+                    <div class="rank-badge ${index < 3 ? 'rank-' + (index + 1) : 'rank-other'}">${index + 1}</div>
+                    <div class="content">
+                        <div class="name">${club.name}</div>
+                        <div class="stats">
+                            <span>粉丝 <span class="highlight">${club.fans}万</span></span>
+                            <span>好评 <span class="highlight">${club.rating}%</span></span>
+                            <span>月订单 <span class="highlight">${club.orders}单</span></span>
+                        </div>
+                        <div class="prices">
+                            <span class="price-item">护航 <strong>¥${club.priceEscort}</strong></span>
+                            <span class="price-item">跑刀 <strong>¥${club.priceRun}</strong></span>
+                            <span class="price-item">代肝 <strong>¥${club.priceBoost}</strong></span>
+                        </div>
+                        <div class="tags">
+                            ${club.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 导航切换
+        document.getElementById('navTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-tab')) {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentSort = e.target.dataset.sort;
+                renderList();
+            }
+        });
+        
+        // 打开弹窗
+        function openModal(id) {
+            const club = clubs.find(c => c.id === id);
+            document.getElementById('modalTitle').textContent = club.name;
+            document.getElementById('douyinLink').href = club.douyinUrl;
+            
+            document.getElementById('priceGrid').innerHTML = `
+                <div class="price-card">
+                    <div class="service-name">基础护航</div>
+                    <div class="service-price">¥${club.priceEscort}/局</div>
+                </div>
+                <div class="price-card">
+                    <div class="service-name">跑刀护航</div>
+                    <div class="service-price">¥${club.priceRun}/局</div>
+                </div>
+                <div class="price-card">
+                    <div class="service-name">代肝服务</div>
+                    <div class="service-price">¥${club.priceBoost}</div>
+                </div>
+                <div class="price-card">
+                    <div class="service-name">定制教学</div>
+                    <div class="service-price">¥${club.priceTeach}</div>
+                </div>
+            `;
+            
+            document.getElementById('infoSection').innerHTML = `
+                <div class="info-item">
+                    <div class="label">粉丝数量</div>
+                    <div class="value">${club.fans}万</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">好评率</div>
+                    <div class="value">${club.rating}%</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">月订单量</div>
+                    <div class="value">${club.orders}单</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">售后保障</div>
+                    <div class="value">${club.support售后 ? '支持' : '不支持'}</div>
+                </div>
+            `;
+            
+            document.getElementById('orderBtn').onclick = () => {
+                window.open(club.orderUrl, '_blank');
+            };
+            
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+        
+        // 点击遮罩关闭
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        });
+        
+        // ESC关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+        // 初始渲染
+        renderList();
+    </script>
+</body>
+</html>
